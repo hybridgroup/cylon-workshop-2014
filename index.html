@@ -149,604 +149,352 @@
         </section>
 
         <section>
-          <h2>Update</h2>
+          <h2>Update package.json</h2>
         </section>
 
 
 
         <section>
           <section>
-            <h2>Tessel</h2>
+            <h2>Blinking LED</h2>
           </section>
 
           <section>
             <pre><code data-trim>
-var Cylon = require('cylon');
- 
-Cylon.robot({
-  connection: { name: 'tessel', adaptor: 'tessel', port: 'GPIO' },
-  device: { name: 'led', driver: 'led', pin: 3 },
- 
-  work: function(my) {
-    every((1).second(), function(){ my.led.toggle() });
-  }
-}).start();
-            </code></pre>
-          </section>
+var cylon = require('cylon');
 
-          <section>
-            <img src="http://localhost:8080/?action=stream">  
-          </section>          
-        </section>
-
-        <section>
-          <section>
-            <h2>BeagleBone Black</h2>
-          </section>
-
-          <section>
-            <pre><code data-trim>
-var Cylon = require('cylon');
-
-Cylon.robot({
-  connection: { name: 'beaglebone', adaptor: 'beaglebone' },
-  device: { name: 'led', driver: 'led', pin: 'P9_12' },
-
-  work: function(my) {
-    every((1).second(), function(){ my.led.toggle() });
-  }
-}).start();
-            </code></pre>
-          </section>
-
-          <section>
-            <img src="http://localhost:8080/?action=stream">  
-          </section>          
-        </section>
-
-        <section>
-          <section>
-            <h2>Choose Your Own Hardware Adventure!</h2>
-          </section>
-
-          <section>
-            <h2>To win a Sphero, tweet</h2>
-            <h2>@gosphero and @cylonjs</h2>
-          </section>
-
-          <section>
-            <h2>To win a Pebble, tweet</h2>
-            <h2>@pebble and @cylonjs</h2>
-          </section>
-
-          <section>
-            <h2>To win a Beaglebone Black, tweet</h2>
-            <h2>@beagleboardorg and @cylonjs</h2>
-          </section>
-        </section>
-
-        <section>
-          <section>
-            <h2>Sphero + Leap Motion</h2>
-          </section>
-
-          <section>
-            <pre><code data-trim>
-var Cylon = require('cylon');
-
-Cylon.robot({
-  connections: [
-    { name: 'leapmotion', adaptor: 'leapmotion', port: '127.0.0.1:6437' },
-    { name: 'sphero', adaptor: 'sphero', port: '/dev/rfcomm0' }
-  ],
-  devices: [
-    { name: 'leapmotion', driver: 'leapmotion', connection: 'leapmotion' },
-    { name: 'sphero', driver: 'sphero', connection: 'sphero' }
-  ],
-  work: function(my) {
-    var y = 0;
-    var x = 0;
-    my.sphero.setBackLED(255)
-
-    my.leapmotion.on('hand', function(hand) {
-      y = hand.palmY.fromScale(50, 200).toScale(0, 90) | 0;
-      x = hand.palmX.fromScale(-30, 50).toScale(0, 90) | 0;
-    });
-
-    every((1).second(), function() {
-      my.sphero.setRGB(Math.floor(Math.random() * 16777216));
-    });
-    
-    every((0.01).second(), function() {
-      if (x != 0) {
-        if (x > 45) {
-          my.sphero.roll(40, x.fromScale(45, 90).toScale(90, 180) | 0);
-        } else {
-          my.sphero.roll(40, x.fromScale(0, 45).toScale(270, 359) | 0);
-        }
-      } else {
-        if (y > 45) {
-          my.sphero.roll(40, y.fromScale(45, 90).toScale(0, 90) | 0);
-        } else {
-          my.sphero.roll(40, y.fromScale(0, 45).toScale(180, 270) | 0);
-        }
-      }
-    });
-  }
+cylon.robot({
+  name: robotName,
+  connection: { name: 'edison', adaptor: 'intel-iot' },
+  device: { name: 'led', driver: 'led', pin: 4, connection: 'edison' }
 })
-
-Cylon.start();
-            </code></pre>
-          </section>
-
-        </section>
-
-        <section>
-          <section>
-            <h2>Sphero + Robeaux</h2>
-          </section>
-
-          <section>
-            <h2>Conway's Game Of Life</h2>
-          </section>
-
-          <section>
-            <div class="image-container">
-              <img src="images/conway-1.png">
-            </div>
-          </section>
-
-          <section>
-            <div class="image-container">
-              <img src="images/conway-2.png">
-            </div>
-          </section>
-
-          <section>
-            <h2>Conway's Game Of Life...
-            With ROBOTS!</h2>
-          </section>
-
-          <section>
-            <div class="image-container">
-              <img src="images/conway-3.png">
-            </div>
-          </section>
-
-          <section>
-            <pre><code data-trim>
-var Cylon = require('cylon');
-
-var bots = [
-  { port: '/dev/rfcomm0', name: 'Thelma' },
-  { port: '/dev/rfcomm1', name: 'Louise' },
-  { port: '/dev/rfcomm2', name: 'Grace' },
-  { port: '/dev/rfcomm3', name: 'Ada' },
-  { port: '/dev/rfcomm4', name: 'Mary' }
-];
-
-var Green = 0x00FF00;
-var Red = 0xFF0000;
-
-var ConwayRobot = (function() {
-  function ConwayRobot() {}
-
-  ConwayRobot.prototype.connection = { name: 'Sphero', adaptor: 'sphero' };
-  ConwayRobot.prototype.device = { name: 'sphero', driver: 'sphero' };
-
-  ConwayRobot.prototype.born = function() {
-    this.contacts = 0;
-    this.age = 0;
-    this.alive = true;
-    this.life();
-    this.move();
-  };
-
-  ConwayRobot.prototype.move = function() {
-    this.sphero.roll(60, Math.floor(Math.random() * 360));
-  };
-
-  ConwayRobot.prototype.life = function() {
-    this.alive = true;
-    this.sphero.setRGB(Green);
-  };
-
-  ConwayRobot.prototype.death = function() {
-    this.alive = false;
-    this.sphero.setRGB(Red);
-    this.sphero.stop();
-  };
-
-  ConwayRobot.prototype.enoughContacts = function() {
-    return (this.contacts > 2 && this.contacts < 7);
-  };
-
-  ConwayRobot.prototype.birthday = function() {
-    this.age += 1;
-
-    console.log("Happy birthday, " + this.name + ". You are " + this.age + " and had " + this.contacts + " contacts.");
-
-    if (this.enoughContacts()) {
-      if (this.alive == false) { this.rebirth(); }
-    } else {
-      this.death();
-    }
-
-    this.contacts = 0;
-  };
-
-  ConwayRobot.prototype.work = function(me) {
-    var self = this;
-    me.sphero.on('connect', function() {
-        me.sphero.detectCollisions();
-        me.born();
-    });
-
-    me.sphero.on('collision', function() {
-      self.contacts += 1;
-    });
-
-    every((3).seconds(), function() {
-      if (me.alive != false) { me.move(); }
-    });
-
-    every((10).seconds(), function() {
-      if (me.alive != false) { 
-        me.birthday(); 
-      }
-    });
-  };
-
-  return ConwayRobot;
-
-})();
-
-for (var i = 0; i < bots.length; i++) {
-  var bot = bots[i];
-  var robot = new ConwayRobot;
-
-  robot.connection.port = bot.port;
-  robot.name = bot.name;
-
-  Cylon.robot(robot);
-}
-
-Cylon.api({host: '192.168.1.116', port: '8080', ssl:  false});
-
-Cylon.start();
-            </code></pre>
-          </section>
-
-          <section>
-            <h2><a href='http://10.22.25.22:8080' target="_new">Robeaux - Universal Robot API</a></h2>
-          </section>
-
-          <section>
-            <img src="http://localhost:8080/?action=stream">  
-          </section>          
-        </section>
-
-        <section>
-          <section>
-            <h2>ARDrone + OpenCV + PS3 Controller + <a href='file:///home/ron/Development/gobot/brain/index.html' target="_new">Neurosky</a></h2>
-          </section>
-          <section>
-            <pre><code data-trim>
-var Cylon = require('cylon');
-
-Cylon.robot({
-  connections: [
-    {name: 'opencv', adaptor: 'opencv'},
-    {name: 'dualshock3', adaptor: 'joystick', controller: 'dualshock3'}, 
-    {name: 'ardrone', adaptor: 'ardrone', port: '192.168.1.1'}
-  ],
-  devices: [
-    {name: 'mat', driver: 'mat', conneciton: 'opencv' },
-    {name: 'window', driver: 'window', conneciton: 'opencv'},
-    {name: 'controller', driver: 'dualshock3', connection: 'dualshock3'}, 
-    {name: 'drone', driver: 'ardrone', connection: 'ardrone'}
-  ],
-  validate_pitch: function(data, offset) {
-    var value;
-    value = Math.abs(data) / offset;
-    if (value >= 0.1) {
-      if (value <= 1.0) {
-        return Math.round(value * 100.0) / 100.0;
-      } else {
-        return 1.0;
-      }
-    } else {
-      return 0.0;
-    }
-  },
-  work: function(my) {
-    var self = this; 
-    self.offset = 125.0;
-    self.right_stick = {
-      x: self.offset,
-      y: self.offset
-    };
-    self.left_stick = {
-      x: self.offset,
-      y: self.offset
-    };
-
-    my.drone.getPngStream().on('data', function(png) {
-      my.mat.readImage(png, function(err, img) {
-        my.window.show(img);
-      });
-    });
-    my.controller.on("square:press", function(data) {
-      my.drone.takeoff();
-    });
-    my.controller.on("triangle:press", function(data) { 
-      my.drone.hover()
-    });
-    my.controller.on("x:press", function(data) {
-      my.drone.land()
-    });
-    my.controller.on("right:move", function(data) {
-      self.right_stick = data;
-    });
-    my.controller.on("left:move", function(data) {
-      self.left_stick = data;
-    });
-    every(0, function() {
-      var pair;
-      pair = self.left_stick;
-      if (pair.y < self.offset - 5) {
-        my.drone.front(my.validate_pitch(pair.y - self.offset, self.offset));
-      } else if (pair.y > self.offset + 5) {
-        my.drone.back(my.validate_pitch(pair.y - self.offset, self.offset));
-      }
-      if (pair.x > self.offset + 5) {
-        my.drone.right(my.validate_pitch(pair.x - self.offset, self.offset));
-      } else if (pair.x < self.offset - 5) {
-        my.drone.left(my.validate_pitch(pair.x - self.offset, self.offset));
-      }
-    });
-    every(0, function() {
-      var pair;
-      pair = self.right_stick;
-      if (pair.y < self.offset - 5) {
-        my.drone.up(my.validate_pitch(pair.y - self.offset, self.offset));
-      } else if (pair.y > self.offset + 5) {
-        my.drone.down(my.validate_pitch(pair.y - self.offset, self.offset));
-      }
-      if (pair.x > self.offset + 20) {
-        my.drone.clockwise(my.validate_pitch(pair.x - self.offset, self.offset));
-      } else if (pair.x < self.offset - 20) {
-        my.drone.counterClockwise(my.validate_pitch(pair.x - self.offset, self.offset));
-      }
-    });
-    every((0.1).seconds(), my.drone.hover);
-  }
-});
-
-Cylon.start();
-            </code></pre>
-          </section>
-          <section>
-            <pre><code data-trim>
-var Cylon = require('cylon');
-
-Cylon.robot({
-  connection:
-    {name: 'neurosky', adaptor: 'neurosky', port: '/dev/rfcomm0'},
-
-  device:
-    {name: 'headset', driver: 'neurosky'},
-
-  work: function(my) {
-    my.headset.on('eeg', function(data) {
-      Logger.info(data);
-    });
-  }
-});
-
-Cylon.start();
-            </code></pre>            
-          </section>
-        </section>
-
-        <section>
-          <h2>Pebble (Featuring Artoo) + </h2>
-          <h2>ARDrone + OpenCV + </h2>
-          <h2>Sphero + DigiSpark (Featuring Gobot)</h2>
-        </section>
-
-        <section>
-          <section>
-            <div class="image-container">
-              <img src="images/artoo-logo.png">
-              <img src="images/artoo-robot.png">
-            </div>
-            <h3>artoo.io</h3>
-          </section>
-
-          <section>
-            <pre><code data-trim>
-require 'artoo'
-require 'http'
- 
-connection :pebble, :adaptor => :pebble
-device     :watch,  :driver  => :pebble, :name => 'pebble'
- 
-api :host => '0.0.0.0', :port => '8080'
- 
-name 'pebble'
- 
-def button_push(*data)
-  unless data[1].nil?
-    puts "Posting to Cylon"
-    HTTP[:content_type => 'application/json'].get "https://192.168.1.3:3000/robots/drone/commands/faceOff"
-    p "#{data[1]} button pushed"
-  end
-end
- 
-work do
-  pebble.send_notification("Hello Pebble!")
-  on pebble, :button => :button_push
-end
-            </code></pre>
-          </section>
-        </section>
-          
-        <section>
-          <pre><code data-trim>
-var Cylon = require('cylon');
-var rest = require('restler');
-var haarcascade = "" + __dirname + "/haarcascade_frontalface_alt.xml";
- 
-var DroneRobot = (function(){ 
-
-  function DroneRobot() {} 
- 
-  DroneRobot.prototype.commands = ["faceOff"];
- 
-  DroneRobot.prototype.connections = [
-    { name: 'opencv', adaptor: 'opencv' }, 
-    { name: 'ardrone', adaptor: 'ardrone', port: '192.168.1.1' }
-  ];
-  
-  DroneRobot.prototype.devices = [
-    { name: 'drone', driver: 'ardrone', connection: 'ardrone' }, 
-    { name: 'window', driver: 'window', conneciton: 'opencv' }, 
-    { name: 'mat', driver: 'mat', conneciton: 'opencv' }
-  ];
- 
-  DroneRobot.prototype.work = function(my) {
-    console.log("SHOW ME YOUR FACE!");
-  };
- 
-  DroneRobot.prototype.faceOff = function() {
-    var my = this;
-    var self = this;
-    self.detect = false;
-    self.image = null;
-    my.drone.getPngStream().on('data', function(png) {
-      my.mat.readImage(png, function(err, img) {
-        self.image = img;
-        if (self.detect === false) {
-          my.window.show(img);
-        }
-      });
-    });
-    my.mat.on('facesDetected', function(err, im, faces) {
-      var biggest, center_x, f, face, turn;
-      biggest = 0;
-      face = null;
-      for (var i = 0; i < faces.length; i++) {
-        f = faces[i];
-        if (f.width > biggest) {
-          biggest = f.width;
-          face = f;
-        }
-      }
-      if (face !== null && (face.width <= 100 && face.width >= 45)) {
-        rest.get('http://192.168.1.1:3000/robots/digispark/devices/led/commands/ToggleC').on('complete', function(result) {
-          if (result instanceof Error) {
-            console.log('Error:', result.message);
-          } 
-        });
-        rest.get('http://127.0.0.1:3001/robots/mod/commands/WakeUp').on('complete', function(result) {
-          if (result instanceof Error) {
-            console.log('Error:', result.message);
-          } 
-        });
-        im.rectangle([face.x, face.y], [face.x + face.width, face.y + face.height], 
-          [0, 255, 0], 2);
-        center_x = im.width() * 0.5;
-        turn = -(face.x - center_x) / center_x;
-        console.log("turning: " + turn);
-        if (turn < 0) {
-          my.drone.clockwise(Math.abs(turn * 0.7));
-        } else {
-          my.drone.counterClockwise(Math.abs(turn * 0.7));
-        }
-      } else {
-        rest.get('http://192.168.1.1:3000/robots/digispark/devices/led/commands/OffC').on('complete', function(result) {
-          if (result instanceof Error) {
-            console.log('Error:', result.message);
-          } 
-        });
-        rest.get('http://127.0.0.1:3001/robots/mod/commands/Snooze').on('complete', function(result) {
-          if (result instanceof Error) {
-            console.log('Error:', result.message);
-          } 
-        });
-      }
-      my.window.show(im);
-    });
-    my.drone.takeoff();
-    after((8).seconds(), function() { my.drone.up(0.5); });
-    after((10).seconds(), function() { my.drone.hover(); });
-    after((13).seconds(), function() {
-      self.detect = true;
-      every(0.3.seconds(), function() {
-        my.drone.hover();
-        my.mat.detectFaces(self.image, haarcascade);
-      });
-      after((30).seconds(), function() { my.drone.land(); });
-    });
-  };
- 
-  return DroneRobot;
-})();
- 
-var robot = new DroneRobot;
-robot.name = "drone";
- 
-Cylon.robot(robot);
-Cylon.api({ host: '192.168.1.3', port: '3000' });
-Cylon.start();
-          </code></pre>
-        </section>
-
-        <section>
-          <section>
-            <div class="image-container">
-              <img src="images/gobot-logo.png">
-            </div>
-            <h3>gobot.io</h3>
-          </section>
-
-          <section>
-            <pre><code data-trim>
-package main
- 
-import (
-  "github.com/hybridgroup/gobot"
-  "github.com/hybridgroup/gobot-digispark"
-  "github.com/hybridgroup/gobot-gpio"
-)
- 
-func main() {
-  master := gobot.GobotMaster()
-  gobot.Api(master)
- 
-  digispark := new(gobotDigispark.DigisparkAdaptor)
-  digispark.Name = "digispark"
- 
-  led := gobotGPIO.NewLed(digispark)
-  led.Name = "led"
-  led.Pin = "2"
- 
-  master.Robots = append(master.Robots, &gobot.Robot{
-    Name:        "digispark",
-    Connections: []gobot.Connection{digispark},
-    Devices:     []gobot.Device{red},
+  .on('ready', function(my) {
+    setInterval(function() {
+      my.led.toggle();
+    }, 1000);
   })
- 
-  master.Start()
-}
-            </code></pre>            
+  .start();
+            </code></pre>
+          </section>
+        </section>
+
+
+
+        <section>
+          <section>
+            <h2>LED + Touch Sensor</h2>
           </section>
 
           <section>
-            <img src="http://localhost:8080/?action=stream">  
-          </section>          
+            <pre><code data-trim>
+var cylon = require('cylon');
+
+cylon.robot({
+  name: robotName,
+  connection: { name: 'edison', adaptor: 'intel-iot' },
+  device: [
+    { name: 'led', driver: 'led', pin: 4, connection: 'edison' },
+    { name: 'touch', driver: 'button', pin: 3, connection: 'edison' },
+  ]
+})
+  .on('ready', function(my) {
+    my.touch.on('press', function() {
+      my.led.turnOn();
+    });
+
+    my.touch.on('release', function() {
+      my.led.turnOff();
+    });
+  })
+  .start();
+            </code></pre>
+          </section>
         </section>
+
+
+        <section>
+          <section>
+            <h2>Salesforce + LED + Touch Sensor</h2>
+          </section>
+
+          <section>
+            <pre><code data-trim>
+var cylon = require('cylon');
+var robotName = 'cylon01';
+var username = 'user';
+var password = 'password';
+// Paste Cylon.js robot code below this line
+
+cylon.robot({
+  name: robotName,
+  connections: [
+    { name: 'edison', adaptor: 'intel-iot' },
+    { name: 'sfcon', adaptor: 'force', sfuser: username, sfpass: password}
+  ],
+  device: [
+    { name: 'salesforce', driver: 'force', connection: 'sfcon' },
+    { name: 'led', driver: 'led', pin: 4, connection: 'edison' },
+    { name: 'touch', driver: 'button', pin: 3, connection: 'edison' },
+  ]
+})
+  .on('ready', function(my) {
+    my.salesforce.subscribe('BoardMsgOutbound', function(err, data) {
+      if (err != null) {
+        console.log(err);
+      } else if (data.sobject.board_id__c === my.name) {
+        if (data.sobject.touch_sensor__c === true) {
+          my.led.turnOn();
+        } else if (data.sobject.touch_sensor__c === false) {
+          my.led.turnOff();
+        }
+      }
+    });
+
+    my.touch.on('press', function() {
+      var toSend = {
+        boardId: my.name,
+        touchSensor: true
+      };
+      my.salesforce.post('/Boards/', toSend, function(err, data) {
+        if (err != null) {
+          console.log("Error sending touch sensor information: " + err);
+        } else {
+          console.log('Board Msg has been sent to Salesforce.');
+        }
+      });
+    });
+
+    my.touch.on('release', function() {
+      var toSend = {
+        boardId: my.name,
+        touchSensor: false
+      };
+      my.salesforce.post('/Boards/', toSend, function(err, data) {
+        if (err != null) {
+          console.log("Error sending touch sensor information: " + err);
+        } else {
+          console.log('Board Msg has been sent to Salesforce.');
+        }
+      });
+    });
+  })
+  .start();
+            </code></pre>
+          </section>
+        </section>
+
+
+        <section>
+          <section>
+            <h2>Salesforce + LED + Touch Sensor + Analog Sensor</h2>
+          </section>
+
+          <section>
+            <pre><code data-trim>
+var cylon = require('cylon');
+var robotName = 'cylon01';
+var username = 'user';
+var password = 'password';
+// Paste Cylon.js robot code below this line
+
+cylon.robot({
+  name: robotName,
+  connections: [
+    { name: 'edison', adaptor: 'intel-iot' },
+    { name: 'sfcon', adaptor: 'force', sfuser: username, sfpass: password}
+  ],
+  device: [
+    { name: 'salesforce', driver: 'force', connection: 'sfcon' },
+    { name: 'led', driver: 'led', pin: 4, connection: 'edison' },
+    { name: 'touch', driver: 'button', pin: 3, connection: 'edison' },
+    { name: 'sensor', driver: 'analogSensor', pin: 0, connection: 'edison' }
+  ]
+})
+  .on('ready', function(my) {
+    var ready = false;
+    var sensorVal = 0;
+    my.salesforce.subscribe('BoardMsgOutbound', function(err, data) {
+      if (err != null) {
+        console.log(err);
+      } else if (data.sobject.board_id__c === my.name) {
+        if (data.sobject.touch_sensor__c === true) {
+          my.led.turnOn();
+        } else if (data.sobject.touch_sensor__c === false) {
+          my.led.turnOff();
+        }
+        var sensor = data.sobject.analog_sensor__c;
+        if (sensor != null) {
+          console.log("Reading: " + sensor);
+        }
+      }
+    });
+
+    my.touch.on('press', function() {
+      ready = true;
+      var toSend = {
+        boardId: my.name,
+        touchSensor: true
+      };
+      my.salesforce.post('/Boards/', toSend, function(err, data) {
+        if (err != null) {
+          console.log("Error sending touch sensor information: " + err);
+        } else {
+          console.log('Board Msg has been sent to Salesforce.');
+        }
+      });
+    });
+
+    my.touch.on('release', function() {
+      ready = false;
+      var toSend = {
+        boardId: my.name,
+        touchSensor: false 
+      };
+      my.salesforce.post('/Boards/', toSend, function(err, data) {
+        if (err != null) {
+          console.log("Error sending touch sensor information: " + err);
+        } else {
+          console.log('Board Msg has been sent to Salesforce.');
+        }
+      });
+    });
+
+    my.sensor.on('analogRead', function(data) {
+      sensorVal = data;
+    });
+
+    setInterval(function() {
+      if (ready) {
+        var toSend = {
+          boardId: my.name,
+          touchSensor: true,
+          analogSensor: sensorVal
+        };
+        my.salesforce.post('/Boards/', toSend, function(err, data) {
+        if (err != null) {
+          console.log("Error sending analog sensor information: " + err);
+        }
+        });
+      }
+    }, 2000);
+  })
+  .start();
+            </code></pre>
+          </section>
+        </section>
+
+
+        <section>
+          <section>
+            <h2>Salesforce + LED + Button + Analog Sensor + LCD Display</h2>
+          </section>
+
+          <section>
+            <pre><code data-trim>
+var cylon = require('cylon');
+var robotName = 'cylon01';
+var username = 'user';
+var password = 'password';
+// Paste Cylon.js robot code below this line
+
+function writeToScreen(screen, message) {
+  screen.setCursor(0,0);
+  screen.write(message);
+}
+
+cylon.robot({
+  name: robotName,
+  connections: [
+    { name: 'edison', adaptor: 'intel-iot' },
+    { name: 'sfcon', adaptor: 'force', sfuser: username, sfpass: password}
+  ],
+  device: [
+    { name: 'salesforce', driver: 'force', connection: 'sfcon' },
+    { name: 'led', driver: 'led', pin: 4, connection: 'edison' },
+    { name: 'touch', driver: 'button', pin: 3, connection: 'edison' },
+    { name: 'sensor', driver: 'analogSensor', pin: 0, connection: 'edison' },
+    { name: 'screen', driver: 'upm-jhd1313m1', connection: 'edison' }
+  ]
+})
+  .on('ready', function() {
+    var ready = false;
+    var sensorVal = 0;
+
+    writeToScreen(my.screen, "Ready!");
+
+    my.salesforce.subscribe('BoardMsgOutbound', function(err, data) {
+      if (err != null) {
+        console.log(err);
+      } else if (data.sobject.board_id__c === my.name) {
+        if (data.sobject.touch_sensor__c === true) {
+          my.led.turnOn();
+        } else if (data.sobject.touch_sensor__c === false) {
+          my.led.turnOff();
+        }
+        var sensor = data.sobject.analog_sensor__c;
+        if (sensor != null) {
+          var pad = "0000";
+          var message = "Reading: " + (pad+sensor.toString()).slice(-pad.length);
+          writeToScreen(my.screen, message);
+          console.log(message);
+        }
+      }
+    });
+
+    my.touch.on('press', function() {
+      ready = true;
+      var toSend = {
+        boardId: my.name,
+        touchSensor: true
+      };
+      my.salesforce.post('/Boards/', toSend, function(err, data) {
+        if (err != null) {
+          console.log("Error sending touch sensor information: " + err);
+        } else {
+          console.log('Board Msg has been sent to Salesforce.');
+        }
+      });
+    });
+
+    my.touch.on('release', function() {
+      ready = false;
+      var toSend = {
+        boardId: my.name,
+        touchSensor: false 
+      };
+      my.salesforce.post('/Boards/', toSend, function(err, data) {
+        if (err != null) {
+          console.log("Error sending touch sensor information: " + err);
+        } else {
+          console.log('Board Msg has been sent to Salesforce.');
+        }
+      });
+    });
+
+    my.sensor.on('analogRead', function(data) {
+      sensorVal = data;
+    });
+
+    setInterval(function() {
+      if (ready) {
+        var toSend = {
+          boardId: my.name,
+          touchSensor: true,
+          analogSensor: sensorVal
+        };
+        my.salesforce.post('/Boards/', toSend, function(err, data) {
+        if (err != null) {
+          console.log("Error sending analog sensor information: " + err);
+        }
+        });
+      }
+    }, 2000);
+  })
+  .start();
+            </code></pre>
+          </section>
+        </section>
+        
 
         <section>
           <h2>Was that fun?</h2>
@@ -759,16 +507,6 @@ func main() {
         <section>
           <h2>cylonjs.com</h2>
           <h3>@cylonjs</h3>
-        </section>
-
-        <section>
-          <h2>artoo.io</h2>
-          <h3>@artooio</h3>
-        </section>
-
-        <section>
-          <h2>gobot.io</h2>
-          <h3>@gobotio</h3>
         </section>
 
         <section>
