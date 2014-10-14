@@ -174,7 +174,6 @@
 var cylon = require('cylon');
 
 cylon.robot({
-  name: robotName,
   connection: { name: 'edison', adaptor: 'intel-iot' },
   device: { name: 'led', driver: 'led', pin: 4, connection: 'edison' }
 })
@@ -206,7 +205,6 @@ cylon.robot({
 var cylon = require('cylon');
 
 cylon.robot({
-  name: robotName,
   connection: { name: 'edison', adaptor: 'intel-iot' },
   device: [
     { name: 'led', driver: 'led', pin: 4, connection: 'edison' },
@@ -231,6 +229,10 @@ cylon.robot({
         <section>
           <section>
             <h2>Salesforce + LED + Touch Sensor</h2>
+          </section>
+
+          <section>
+            <h2>bit.ly/cylon-df14pass</h2>
           </section>
 
           <section>
